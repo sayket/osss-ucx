@@ -18,6 +18,10 @@ shcoll_set_knomial_tree_radix_barrier(int tree_radix)
     knomial_tree_radix_barrier = tree_radix;
 }
 
+
+
+
+
 /*
  * Linear barrier implementation
  */
@@ -38,6 +42,13 @@ barrier_sync_helper_linear(int PE_start,
         shmem_long_wait_until(pSync, SHMEM_CMP_EQ,
                               SHCOLL_SYNC_VALUE + PE_size - 1);
         shmem_long_p(pSync, SHCOLL_SYNC_VALUE, me);
+
+        /* @Abdullah, Why do we need this shmem_long_wait_untill() call?
+         * Doesn't the shmem_long_p call already makes the pSync value 0 (SCHOLL_SYNC_VALUE)?
+         * Answer: shmem_long_p is non blocking, hence even if it's updating something in the
+         * same PE, confirmation of the update is not guaranteed. This shmem_long_wait_until()
+         * provides the guarantee
+         */
         shmem_long_wait_until(pSync, SHMEM_CMP_EQ, SHCOLL_SYNC_VALUE);
 
         /* send acks out */
@@ -51,6 +62,10 @@ barrier_sync_helper_linear(int PE_start,
         shmem_long_atomic_inc(pSync, PE_start);
 
         /* get ack */
+        /* @Abdullah,
+         * Wait till the pSync is 0 (SCHOLL_SYNC_VALUE)
+         * Return if pSync is not equal to 0 (SCHOLL_SYNC_VALUE) 
+         */
         shmem_long_wait_until(pSync, SHMEM_CMP_NE, SHCOLL_SYNC_VALUE);
         shmem_long_p(pSync, SHCOLL_SYNC_VALUE, me);
         shmem_long_wait_until(pSync, SHMEM_CMP_EQ, SHCOLL_SYNC_VALUE);

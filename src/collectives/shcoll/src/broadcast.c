@@ -7,6 +7,13 @@
 static int tree_degree_broadcast = 2;
 static int knomial_tree_radix_barrier = 2;
 
+
+/*
+ * @Abdullah, this file is going to be very useful for the eureka implementation
+ * We can implement the termination message emitting procedure based on these
+ * algorithms
+ */
+
 void
 shcoll_set_broadcast_tree_degree(int tree_degree)
 {
